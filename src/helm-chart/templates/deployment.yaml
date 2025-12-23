@@ -30,6 +30,21 @@ spec:
       serviceAccountName: {{ include "daywriter.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      nodeSelector:
+        env: {{ .Values.environment }}
+      tolerations:
+        - key: "{{ .Values.environment }}"
+          operator: "Equal"
+          value: "true"
+          effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: {{ include "daywriter.fullname" . }}
+                  app.kubernetes.io/instance: {{ .Release.Name }}
+              topologyKey: "kubernetes.io/hostname"
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -39,6 +54,10 @@ spec:
           env:
             - name: POSTGRES_CONNECTION_STRING
               value: {{ .Values.postgresConnectionString }}
+            - name: ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
