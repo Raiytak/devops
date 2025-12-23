@@ -2,19 +2,60 @@ apiVersion: skaffold/v3
 kind: Config
 metadata:
   name: postgres
-deploy:
-  helm:
-    flags:
-      install:
-        - --create-namespace
-    releases:
-      - name: postgresql
-        repo: https://charts.bitnami.com/bitnami
-        remoteChart: postgresql
-        version: 15.5.38
-        namespace: daywriter
-        setValues:
-          global.postgresql.auth.database: datesaver
-          image.registry: docker.io/bitnamilegacy
-          image.repository: postgresql
-          image.tag: 16.4.0-debian-12-r14
+build:
+  artifacts:
+    - image: daywriter
+      context: src
+      docker:
+        dockerfile: Dockerfile
+
+profiles:
+  - name: dev
+    deploy:
+      helm:
+        flags:
+          install:
+            - --create-namespace
+        releases:
+          - name: postgresql
+            repo: https://charts.bitnami.com/bitnami
+            remoteChart: postgresql
+            version: 15.5.38
+            namespace: dev
+            setValues:
+              global.postgresql.auth.database: datesaver
+              global.postgresql.auth.postgresPassword: postgres
+              global.postgresql.auth.password: postgres
+              image.registry: docker.io/bitnamilegacy
+              image.repository: postgresql
+              image.tag: 16.4.0-debian-12-r14
+          - name: daywriter
+            chartPath: src/helm-chart
+            namespace: dev
+            valuesFiles:
+              - src/helm-chart/values-dev.yaml
+
+  - name: prod
+    deploy:
+      helm:
+        flags:
+          install:
+            - --create-namespace
+        releases:
+        - name: postgresql
+          repo: https://charts.bitnami.com/bitnami
+          remoteChart: postgresql
+          version: 15.5.38
+          namespace: prod
+          setValues:
+            global.postgresql.auth.database: datesaver
+            global.postgresql.auth.postgresPassword: postgres
+            global.postgresql.auth.username: postgres
+            image.registry: docker.io/bitnamilegacy
+            image.repository: postgresql
+            image.tag: 16.4.0-debian-12-r14
+        - name: daywriter
+          chartPath: src/helm-chart
+          namespace: prod
+          valuesFiles:
+            - src/helm-chart/values-prod.yaml
