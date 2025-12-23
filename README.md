@@ -30,3 +30,40 @@ Build and deploy a Postgres database and the application in a Kubernetes cluster
 * The docker-compose yaml file is not expected to run but can be used for testing the containers.
 * You can use any tool to build and deploy these applications but in the case that you want to use skaffold, there is a skaffold file provided that contains the definition for the postgres release, you can update it as necessary to include the DayWriter application as well.
 * You can use minikube or any other tool of your choice to test those applications locally to verify that they work.
+
+## Answer
+
+### Environment Preparation
+To run the application, you can launch a minikube locally:
+```bash
+curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+minikube start
+```
+
+### Application Launch
+Once done, you can install the application using skaffold:
+```bash
+skaffold run -p dev
+skaffold run -p prod
+```
+
+This should deploy the application on both `dev` and `prod` namespaces.
+
+### Verification
+To ensure that everything is running, you can check the logs of the application
+```bash
+k logs -n dev daywriter-...
+k logs -n prod daywriter-...
+```
+
+You should see the date output.
+
+### Cleanup
+```bash
+skaffold delete -p dev
+skaffold delete -p prod
+```
+
+### Note
+Please note that due to the task 3.3, the app will not run by default on the cluster. For it to work, you either need to have a cluster identical to the one described in the tasks, or comment out the lines 38 and 39 in src/helm-chart/templates/deployment.yaml.
