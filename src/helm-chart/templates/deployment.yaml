@@ -11,6 +11,11 @@ spec:
   selector:
     matchLabels:
       {{- include "daywriter.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.maxUnavailable }}
+      maxSurge: 1
   template:
     metadata:
       {{- with .Values.podAnnotations }}

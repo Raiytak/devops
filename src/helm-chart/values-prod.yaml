@@ -6,6 +6,10 @@ environment: prod
 
 # This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
 replicaCount: 3
+# ========
+# Task 3-6
+# ========
+maxUnavailable: 1
 
 # ========
 # Task 3-5
