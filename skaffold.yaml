@@ -15,3 +15,6 @@ deploy:
         namespace: daywriter
         setValues:
           global.postgresql.auth.database: datesaver
+          image.registry: docker.io/bitnamilegacy
+          image.repository: postgresql
+          image.tag: 16.4.0-debian-12-r14
