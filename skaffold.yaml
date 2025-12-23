@@ -8,6 +8,8 @@ build:
       context: src
       docker:
         dockerfile: Dockerfile
+  local:
+    push: false
 
 profiles:
   - name: dev

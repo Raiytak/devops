@@ -1,0 +1,39 @@
+name: Build and Deploy with Skaffold
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  skaffold:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Install Minikube
+        run: |
+          curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
+          install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+          minikube start
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+          chmod +x skaffold
+          sudo mv skaffold /usr/local/bin/skaffold
+
+      - name: Build and deploy dev and prod DayWriter
+        run: |
+          skaffold run -p dev,prod
+      
+      - name: Test 
+        run: |
+          kubectl get pods -n dev
+          kubectl get pods -n prod
+
